@@ -6,8 +6,13 @@ import logger from "morgan";
 import { trim } from "./middleware/trim";
 import { ERR } from "./middleware/midError";
 import { beastRt } from "./routes/BeastRt";
+import { v2 as cloudinary } from "cloudinary";
+import { dBase } from "./data/database";
 
 (async () => {
+    await dBase.initialize()
+    .then(() => console.log("PostgreSQL is now Connected!"))
+    .catch((error) => console.log(error));
     const app: express.Application = express();
     app.use(helmet());
 
@@ -22,6 +27,13 @@ import { beastRt } from "./routes/BeastRt";
             res.status(200).json({ "status message": "OK" });
         };
         next();
+    });
+
+    // Cloudinary Connection
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_API_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
     });
 
     app.use(express.urlencoded({ extended: true }));
