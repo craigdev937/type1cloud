@@ -56,7 +56,7 @@ class BeastClass {
 
     Update: express.Handler = async (req, res, next) => {
         try {
-            let oldIMG = await Beast.findOneBy({
+            const oldIMG = await Beast.findOneBy({
                 id: parseInt(req.params.id)
             });
             await cloudinary.uploader.destroy(oldIMG!.cloudinary_id);
@@ -73,6 +73,24 @@ class BeastClass {
             await beast.save();
             fs.unlinkSync(req.file!.path);
             res.status(res.statusCode).json(beast);
+        } catch (error) {
+            res.status(res.statusCode)
+            .json(res.statusMessage);
+            next(error);
+        }
+    };
+
+    Delete: express.Handler = async (req, res, next) => {
+        try {
+            const oldIMG = await Beast.findOneBy({
+                id: parseInt(req.params.id)
+            });
+            await cloudinary
+                .uploader.destroy(oldIMG!.cloudinary_id);
+            const beastID = await Beast.delete({
+                id: parseInt(req.params.id)
+            });
+            res.status(res.statusCode).json(beastID);
         } catch (error) {
             res.status(res.statusCode)
             .json(res.statusMessage);

@@ -7,7 +7,7 @@ export const beastRt: express.Router = express.Router();
     beastRt.get("/", BEAST.FetchAll);
     beastRt.get("/:id", BEAST.GetOne);
     beastRt.put("/:id", upload.single("image"), BEAST.Update);
-    // beastRt.delete("/:id", );
+    beastRt.delete("/:id", BEAST.Delete);
     
     
     
