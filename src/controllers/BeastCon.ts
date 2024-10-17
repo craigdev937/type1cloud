@@ -37,7 +37,48 @@ class BeastClass {
             .json(res.statusMessage);
             next(error);
         }
-    }
+    };
+
+    GetOne: express.Handler = async (req, res, next) => {
+        try {
+            const beast = await Beast.findOne({
+                where: {
+                    id: parseInt(req.params.id)
+                }
+            });
+            res.status(res.statusCode).json(beast);
+        } catch (error) {
+            res.status(res.statusCode)
+            .json(res.statusMessage);
+            next(error);
+        }
+    };
+
+    Update: express.Handler = async (req, res, next) => {
+        try {
+            let oldIMG = await Beast.findOneBy({
+                id: parseInt(req.params.id)
+            });
+            await cloudinary.uploader.destroy(oldIMG!.cloudinary_id);
+            const newIMG = await cloudinary.uploader.upload(req.file!.path);
+            const beastID = await Beast.findOneBy({
+                id: parseInt(req.params.id)
+            });
+            const beast = Beast.merge(beastID!, {
+                beastName: req.body.beastName,
+                info: req.body.info,
+                image: newIMG.secure_url,
+                cloudinary_id: newIMG.public_id
+            });
+            await beast.save();
+            fs.unlinkSync(req.file!.path);
+            res.status(res.statusCode).json(beast);
+        } catch (error) {
+            res.status(res.statusCode)
+            .json(res.statusMessage);
+            next(error);
+        }
+    };
 };
 
 export const BEAST: BeastClass = new BeastClass();
